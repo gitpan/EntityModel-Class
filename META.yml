@@ -6,14 +6,13 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: 6.31
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.200001, CPAN::Meta::Converter version 2.110240'
+generated_by: 'Dist::Zilla version 4.200001, CPAN::Meta::Converter version 2.110350'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
 name: EntityModel-Class
 requires:
-  Check::UnitCheck: 0
   DateTime: 0
   DateTime::Format::Strptime: 0
   EntityModel::Log: 0.001
@@ -25,4 +24,4 @@ requires:
   Try::Tiny: 0
   parent: 0
   perl: 5.010
-version: 0.001
+version: 0.002

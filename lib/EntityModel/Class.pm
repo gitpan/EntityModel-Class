@@ -7,11 +7,19 @@ use feature ();
 
 use IO::Handle;
 
-our $VERSION = 0.001;
+our $VERSION = 0.002;
+
+require DynaLoader;
+use parent qw(DynaLoader);
+bootstrap EntityModel::Class;
 
 =head1 NAME
 
 EntityModel::Class - define class definition
+
+=head1 VERSION
+
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -107,7 +115,6 @@ rather than classes or simple types.
 
 =cut
 
-use Check::UnitCheck;
 use Try::Tiny;
 use Scalar::Util qw(refaddr);
 use overload;
@@ -287,7 +294,8 @@ sub applyAttributes {
 		}
 	}
 
-	Check::UnitCheck::unitcheckify(sub {
+# Provided as XS addition
+	unitcheckify(sub {
 		# FIXME Can't call any log functions within UNITCHECK
 		local $::DISABLE_LOG = 1;
 		my %ml = %methodList;

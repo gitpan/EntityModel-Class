@@ -1,7 +1,10 @@
 package EntityModel::Hash;
+BEGIN {
+  $EntityModel::Hash::VERSION = '0.002';
+}
 use strict;
 use warnings;
-use 5.10.0;
+use 5.010;
 
 use EntityModel::Log ':all';
 

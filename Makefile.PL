@@ -20,7 +20,6 @@ my %WriteMakefileArgs = (
   'LICENSE' => 'perl',
   'NAME' => 'EntityModel::Class',
   'PREREQ_PM' => {
-    'Check::UnitCheck' => '0',
     'DateTime' => '0',
     'DateTime::Format::Strptime' => '0',
     'EntityModel::Log' => '0.001',
@@ -32,7 +31,7 @@ my %WriteMakefileArgs = (
     'Try::Tiny' => '0',
     'parent' => '0'
   },
-  'VERSION' => '0.001',
+  'VERSION' => '0.002',
   'test' => {
     'TESTS' => 't/*.t'
   }

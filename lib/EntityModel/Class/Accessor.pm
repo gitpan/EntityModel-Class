@@ -1,7 +1,10 @@
 package EntityModel::Class::Accessor;
+BEGIN {
+  $EntityModel::Class::Accessor::VERSION = '0.002';
+}
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';
-use 5.10.0;
+use 5.010;
 use feature ();
 
 =pod

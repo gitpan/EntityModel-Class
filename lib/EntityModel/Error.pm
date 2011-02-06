@@ -1,7 +1,10 @@
 package EntityModel::Error;
+BEGIN {
+  $EntityModel::Error::VERSION = '0.002';
+}
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';
-use 5.10.0;
+use 5.010;
 
 use EntityModel::Log ':all';
 
