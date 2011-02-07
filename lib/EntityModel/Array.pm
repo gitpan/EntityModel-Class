@@ -1,13 +1,29 @@
 package EntityModel::Array;
 BEGIN {
-  $EntityModel::Array::VERSION = '0.002';
+  $EntityModel::Array::VERSION = '0.003';
 }
 use strict;
 use warnings;
 use 5.010;
 use EntityModel::Log ':all';
 
-=pod
+=head1 NAME
+
+EntityModel::Array - wrapper object for dealing with arrayrefs
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+See L<EntityModel::Class>.
+
+=head1 DESCRIPTION
+
+Primarily intended as an abstract interface for use with L<EntityModel> backend storage.
+
+=head1 METHODS
 
 =cut
 
@@ -18,6 +34,12 @@ use overload
 	},
 	fallback => 1;
 
+=head2 C<new>
+
+Instantiates with the given arrayref
+
+=cut
+
 sub new {
 	my ($class, $data, %opt) = @_;
 	bless {
@@ -26,16 +48,34 @@ sub new {
 	}, $class;
 }
 
+=head2 C<count>
+
+Returns the number of items in the arrayref.
+
+=cut
+
 sub count {
 	my $self = shift;
 	return scalar @{$self->{data}};
 }
+
+=head2 C<list>
+
+Returns all items from the arrayref.
+
+=cut
 
 sub list {
 	my $self = shift;
 	return unless $self->{data};
 	return @{$self->{data}};
 }
+
+=head2 C<push>
+
+Push the requested value onto the end of the arrayref.
+
+=cut
 
 sub push : method {
 	my $self = shift;
@@ -47,6 +87,12 @@ sub push : method {
 	return $self;
 }
 
+=head2 C<shift>
+
+Shift the first value out of the arrayref.
+
+=cut
+
 sub shift : method {
 	my $self = shift;
 	my $v = shift(@{$self->{data}});
@@ -56,6 +102,12 @@ sub shift : method {
 	}
 	return $v;
 }
+
+=head2 C<pop>
+
+Pops the last value from the arrayref.
+
+=cut
 
 sub pop : method {
 	my $self = shift;
@@ -67,6 +119,12 @@ sub pop : method {
 	return $v;
 }
 
+=head2 C<unshift>
+
+Unshifts a value onto the start of the arrayref.
+
+=cut
+
 sub unshift : method {
 	my $self = shift;
 	my $v = unshift @{$self->{data}}, @_;
@@ -77,10 +135,22 @@ sub unshift : method {
 	return $v;
 }
 
+=head2 C<join>
+
+Joins the entries in the arrayref using the given value and returns as a scalar.
+
+=cut
+
 sub join : method {
 	my $self = shift;
 	return join(shift, @{$self->{data}});
 }
+
+=head2 C<each>
+
+Perform coderef on each entry in the arrayref.
+
+=cut
 
 sub each : method {
 	my ($self, $code) = @_;
@@ -89,6 +159,12 @@ sub each : method {
 	}
 	return $self;
 }
+
+=head2 C<first>
+
+Returns the first entry in the arrayref.
+
+=cut
 
 sub first {
 	my ($self, $match) = @_;
@@ -101,6 +177,12 @@ sub first {
 	return $first;
 }
 
+=head2 C<last>
+
+Returns the last entry in the arrayref.
+
+=cut
+
 sub last {
 	my ($self, $match) = @_;
 	return $self->{data}[-1] unless defined $match;
@@ -111,6 +193,12 @@ sub last {
 	my ($last) = reverse grep $match, @{$self->{data}};
 	return $last;
 }
+
+=head2 C<grep>
+
+Calls the coderef on each entry in the arrayref and returns the entries for which it returns true.
+
+=cut
 
 sub grep : method {
 	my ($self, $match) = @_;
@@ -145,16 +233,34 @@ sub remove : method {
 	return $self;
 }
 
+=head2 C<clear>
+
+Empty the arrayref.
+
+=cut
+
 sub clear : method {
 	my $self = shift;
 	$self->{data} = [ ];
 	return $self;
 }
 
+=head2 C<arrayref>
+
+Returns the arrayref directly.
+
+=cut
+
 sub arrayref {
 	my ($self) = @_;
 	return $self->{data};
 }
+
+=head2 C<is_empty>
+
+Returns true if there's nothing in the arrayref.
+
+=cut
 
 sub is_empty {
 	my $self = shift;
@@ -162,3 +268,17 @@ sub is_empty {
 }
 
 1;
+
+__END__
+
+=head1 SEE ALSO
+
+Use L<autobox> instead.
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.

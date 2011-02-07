@@ -1,10 +1,30 @@
 package EntityModel::Error;
 BEGIN {
-  $EntityModel::Error::VERSION = '0.002';
+  $EntityModel::Error::VERSION = '0.003';
 }
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';
 use 5.010;
+
+=head1 NAME
+
+EntityModel::Error - generic error object
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+See L<EntityModel::Class>.
+
+=head1 DESCRIPTION
+
+Uses some overload tricks and L<AUTOLOAD> to allow chained method calls without needing to wrap in eval.
+
+=head1 METHODS
+
+=cut
 
 use EntityModel::Log ':all';
 
@@ -60,3 +80,12 @@ sub AUTOLOAD {
 
 1;
 
+__END__
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.

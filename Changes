@@ -1,3 +1,6 @@
+0.003     2011-02-07 04:39:34 Europe/London
+	Tidy up documentation and rename camelCase methods to fit_with_perl_conventions.
+
 0.002     2011-02-06 05:45:33 Europe/London
 	Import modified version of the Check::UnitCheck unitcheckify() handling to
 	 allow running without usemultiplicity defined

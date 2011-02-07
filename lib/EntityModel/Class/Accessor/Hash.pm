@@ -1,6 +1,6 @@
 package EntityModel::Class::Accessor::Hash;
 BEGIN {
-  $EntityModel::Class::Accessor::Hash::VERSION = '0.002';
+  $EntityModel::Class::Accessor::Hash::VERSION = '0.003';
 }
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';
@@ -10,17 +10,33 @@ use feature ();
 use parent qw{EntityModel::Class::Accessor};
 use EntityModel::Hash;
 
-=pod
+=head1 NAME
+
+EntityModel::Class::Accessor::Array - generic class accessor for arrays
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+See L<EntityModel::Class>.
+
+=head1 DESCRIPTION
+
+See L<EntityModel::Class>.
+
+=head1 METHODS
 
 =cut
 
-=head2 C<methodList>
+=head2 method_list
 
 Returns a hash of method definitions.
 
 =cut
 
-sub methodList {
+sub method_list {
 	my ($class, %opt) = @_;
 	my $k = $opt{k};
 	return sub {
@@ -40,3 +56,12 @@ sub methodList {
 
 1;
 
+__END__
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.

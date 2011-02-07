@@ -7,11 +7,7 @@ use feature ();
 
 use IO::Handle;
 
-our $VERSION = 0.002;
-
-require DynaLoader;
-use parent qw(DynaLoader);
-bootstrap EntityModel::Class;
+our $VERSION = '0.003';
 
 =head1 NAME
 
@@ -19,20 +15,23 @@ EntityModel::Class - define class definition
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
  package Thing;
  use EntityModel::Class {
- 	_version => '$Rev: 338 $',
 	_isa => [ 'ThingBase' ],
- 	name => { type => 'string' }
+	name => 'string',
+ 	items => { type => 'array', subclass => 'string' }
  };
 
  package main;
  my $thing = Thing->new();
  $thing->name('A thing');
+ $thing->items->push('an entry');
+ $thing->items->push('another entry');
+ print "Have " . $thing->items->count . " items\n";
  1;
 
 =head1 DESCRIPTION
@@ -41,6 +40,9 @@ Applies a class definition to a package. Automatically includes strict, warnings
 standard features without needing to copy and paste boilerplate code.
 
 =head1 USAGE
+
+NOTE: This is mainly intended for use with L<EntityModel> only, please consider L<Moose> or similar for other
+projects.
 
 Add EntityModel::Class near the top of the target package:
 
@@ -57,7 +59,7 @@ changed revision and author for this file.
 
  use EntityModel::Class { _version => '$Id$' };
 
-=item * C<_isa> - set up the parents for this class, similar to use parent.
+=item * C<_isa> - set up the parents for this class, similar to C<use parent>.
 
  use EntityModel::Class { _isa => 'DateTime' };
 
@@ -70,7 +72,7 @@ Available types include:
 
 =over 4
 
-=item * C<string> - simple string scalar value
+=item * C<string> - simple string scalar value.
 
  use EntityModel::Class { name => { type => 'string' } };
 
@@ -108,12 +110,24 @@ and value indicating the method on that object. For example, C<page => 'path'> w
 C<path> mutator is called on the C<page> attribute. This is intended for use with hash and array containers,
 rather than classes or simple types.
 
+ package Compendium;
  use EntityModel::Class {
  	authors => { type => 'array', subclass => 'Author' },
  	authorByName => { type => 'hash', subclass => 'Author', scope => 'private', watch => { authors => 'name' } }
  };
 
+ package main;
+ my $c = Compendium->new;
+ $c->authors->push(Author->new("Adams"));
+ $c->authors->push(Author->new("Brecht"));
+ print $c->authorByName->{'Adams'}->id;
+
 =cut
+
+# Currently just needed for the unitcheckify helper function
+require DynaLoader;
+use parent qw(DynaLoader);
+bootstrap EntityModel::Class;
 
 use Try::Tiny;
 use Scalar::Util qw(refaddr);
@@ -143,6 +157,8 @@ Apply supplied attributes, and load in the following modules:
 
 =item use 5.010;
 
+=item use Try::Tiny;
+
 =back
 
 =cut
@@ -161,23 +177,35 @@ sub import {
 
 # Basic setup, including strict and other pragmas
 	$class->setup($pkg);
-	$class->applyInheritance($pkg, $info);
-	$class->loadDependencies($pkg, $info);
-	$class->applyLogging($pkg, $info);
-	$class->applyVersion($pkg, $info);
-	$class->applyAttributes($pkg, $info);
-	$class->recordClass($pkg, $info);
+	$class->apply_inheritance($pkg, $info);
+	$class->load_dependencies($pkg, $info);
+	$class->apply_logging($pkg, $info);
+	$class->apply_version($pkg, $info);
+	$class->apply_attributes($pkg, $info);
+	$class->record_class($pkg, $info);
 	1;
 }
 
-sub recordClass {
+=head2 record_class
+
+Add an entry for this class in the central class info hash.
+
+=cut
+
+sub record_class {
 	my ($class, $pkg, $info) = @_;
 	my @attribs = grep { !/^_/ } keys %$info;
 	{ no strict 'refs'; *{$pkg . '::ATTRIBS'} = sub () { @attribs }; }
 	$classInfo{$pkg} = $info;
 }
 
-sub applyInheritance {
+=head2 apply_inheritance
+
+Set up inheritance as required for this class.
+
+=cut
+
+sub apply_inheritance {
 	my ($class, $pkg, $info) = @_;
 # Inheritance
 	my @inheritFrom = @{ $info->{_isa} // [] };
@@ -191,13 +219,13 @@ sub applyInheritance {
 	delete $info->{_isa};
 }
 
-=head2 loadDependencies
+=head2 load_dependencies
 
 Load all modules required for classes
 
 =cut
 
-sub loadDependencies {
+sub load_dependencies {
 	my ($class, $pkg, $info) = @_;
 	my @attribs = grep { !/^_/ && !/~~/ } keys %$info;
 	my @classList = grep { $_ && /:/ } map { $info->{$_}->{subclass} // $info->{$_}->{type} } grep { !$info->{$_}->{defer} } @attribs;
@@ -218,11 +246,11 @@ sub loadDependencies {
 	}
 }
 
-=head2 applyLogging
+=head2 apply_logging
 
 =cut
 
-sub applyLogging {
+sub apply_logging {
 	my ($class, $pkg, $info) = @_;
 # Support logging methods by default, unless explicitly disabled
 	EntityModel::Log->export_to_level(2, $pkg, ':all')
@@ -241,11 +269,13 @@ sub applyLogging {
 	}
 }
 
-=head2 applyVersion
+=head2 apply_version
+
+Record the VCS revision information from C<_vcs> attribute.
 
 =cut
 
-sub applyVersion {
+sub apply_version {
 	my ($class, $pkg, $info) = @_;
 # Typically version is provided as an SVN Rev property wrapped in $ signs.
 	if(exists $info->{_vcs}) {
@@ -254,18 +284,22 @@ sub applyVersion {
 	}
 }
 
-sub applyAttributes {
+=head2 C<apply_attributes>
+
+=cut
+
+sub apply_attributes {
 	my ($class, $pkg, $info) = @_;
 	my %methodList;
 	my @attribs = grep { !/^_/ } keys %$info;
 
-# Smart match support
+# Smart match support - 1 to use a default refaddr-based system, coderef for anything else
 	if(my $match = delete $info->{'~~'}) {
-		$class->addMethod($pkg, '()', sub () { });
+		$class->add_method($pkg, '()', sub () { });
 		if(ref $match) {
-			$class->addMethod($pkg, '(~~', $match);
+			$class->add_method($pkg, '(~~', $match);
 		} else {
-			$class->addMethod($pkg, '(~~', sub {
+			$class->add_method($pkg, '(~~', sub {
 				my ($self, $target) = @_;
 				return 0 unless defined($self) && defined($target);
 				return 0 unless ref($self) && ref($target);
@@ -280,9 +314,9 @@ sub applyAttributes {
 # Anything else is an accessor, set it up
 	foreach my $attr (@attribs) {
 		given($info->{$attr}->{type}) {
-			when('array') { %methodList = (%methodList, EntityModel::Class::Accessor::Array->addToClass($pkg, $attr => $info->{$attr})) }
-			when('hash') { %methodList = (%methodList, EntityModel::Class::Accessor::Hash->addToClass($pkg, $attr => $info->{$attr})) }
-			default { %methodList = (%methodList, EntityModel::Class::Accessor->addToClass($pkg, $attr => $info->{$attr})) }
+			when('array') { %methodList = (%methodList, EntityModel::Class::Accessor::Array->add_to_class($pkg, $attr => $info->{$attr})) }
+			when('hash') { %methodList = (%methodList, EntityModel::Class::Accessor::Hash->add_to_class($pkg, $attr => $info->{$attr})) }
+			default { %methodList = (%methodList, EntityModel::Class::Accessor->add_to_class($pkg, $attr => $info->{$attr})) }
 		}
 	}
 
@@ -290,7 +324,7 @@ sub applyAttributes {
 	foreach my $watcher (grep { exists $info->{$_}->{watch} } @attribs) {
 		my $w = $info->{$watcher}->{watch};
 		foreach my $watched (keys %$w) {
-			$class->addWatcher($pkg, $watcher, $watched, $info->{$watched}, $w->{$watched});
+			$class->add_watcher($pkg, $watcher, $watched, $info->{$watched}, $w->{$watched});
 		}
 	}
 
@@ -299,12 +333,16 @@ sub applyAttributes {
 		# FIXME Can't call any log functions within UNITCHECK
 		local $::DISABLE_LOG = 1;
 		my %ml = %methodList;
-		$class->addMethod($pkg, $_, $ml{$_}) foreach keys %ml;
-		$class->addMethod($pkg, 'import', sub { }) unless $pkg->can('import');
+		$class->add_method($pkg, $_, $ml{$_}) foreach keys %ml;
+		$class->add_method($pkg, 'import', sub { }) unless $pkg->can('import');
 	}) if %methodList;
 }
 
-sub addMethod {
+=head2 C<add_method>
+
+=cut
+
+sub add_method {
 	my $class = shift;
 	my ($pkg, $name, $method) = @_;
 	my $sym = $pkg . '::' . $name;
@@ -353,6 +391,7 @@ sub setup {
 	feature->import(':5.10');
 	Try::Tiny->export_to_level(2); # package -> import -> setup
 
+# Bring in the now, trim and restring helpers
 	foreach my $m (qw/trim now restring/) {
 		no strict 'refs';
 		*{$pkg . '::' . $m} = \&$m;
@@ -374,6 +413,62 @@ sub validator {
 	 ? $allowed : sub { $_[0] ~~ $allowed }
 	 : undef;
 }
+
+=head2 _attrib_info
+
+Returns attribute information for a given package's attribute.
+
+=cut
+
+sub _attrib_info {
+	my $self = shift;
+	my $attr = shift;
+	# return unless ref $self;
+	return $classInfo{ref $self || $self}->{$attr};
+}
+
+=head2 add_watcher
+
+Add watchers as required for all package definitions.
+
+Call this after all the class definitions have been loaded.
+
+=cut
+
+sub add_watcher {
+	my $class = shift;
+	my ($pkg, $obj, $target, $attrDef, $meth) = @_;
+
+# The watcher is called with the new value as add|drop => $v
+	my $sub = sub {
+		my $self = shift;
+		my ($action, $v) = @_;
+		return unless $v;
+		my $k = $meth ? $v->$meth : $v;
+		logDebug("%s for %s with %s", $action, $k, $v);
+		given($action) {
+			when('add') {
+				$self->$obj->set($k, $v);
+			}
+			when('drop') {
+				$self->$obj->erase($k);
+			}
+			default { logError("Don't know %s", $_); }
+		}
+		return $self;
+	};
+
+	given($attrDef->{type}) {
+		when('array') {
+			EntityModel::Class::Accessor::Array->add_watcher($pkg, $target, $sub);
+		}
+		default { die "Unknown type " . ($_ // 'undef'); }
+	}
+}
+
+=head1 IMPORTED FUNCTIONS
+
+The following functions will be added to the namespace of the importing package.
 
 =head2 trim
 
@@ -407,56 +502,26 @@ sub restring {
 	: $str);
 }
 
-=head2 _attribInfo
-
-Returns attribute information for a given package's attribute.
-
-=cut
-
-sub _attribInfo {
-	my $self = shift;
-	my $attr = shift;
-	# return unless ref $self;
-	return $classInfo{ref $self || $self}->{$attr};
-}
-
-=head2 addWatcher
-
-Add watchers as required for all package definitions.
-
-Call this after all the class definitions have been loaded.
-
-=cut
-
-sub addWatcher {
-	my $class = shift;
-	my ($pkg, $obj, $target, $attrDef, $meth) = @_;
-
-# The watcher is called with the new value as add|drop => $v
-	my $sub = sub {
-		my $self = shift;
-		my ($action, $v) = @_;
-		return unless $v;
-		my $k = $meth ? $v->$meth : $v;
-		logDebug("%s for %s with %s", $action, $k, $v);
-		given($action) {
-			when('add') {
-				$self->$obj->set($k, $v);
-			}
-			when('drop') {
-				$self->$obj->erase($k);
-			}
-			default { logError("Don't know %s", $_); }
-		}
-		return $self;
-	};
-
-	given($attrDef->{type}) {
-		when('array') {
-			EntityModel::Class::Accessor::Array->addWatcher($pkg, $target, $sub);
-		}
-		default { die "Unknown type " . ($_ // 'undef'); }
-	}
-}
-
 1;
+
+__END__
+
+=head1 SEE ALSO
+
+Or rather, "please use instead of this module":
+
+=over 4
+
+=item * L<Moose>
+
+=item * L<Moo>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.

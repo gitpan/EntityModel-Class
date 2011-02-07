@@ -1,6 +1,6 @@
 package EntityModel::BaseClass;
 BEGIN {
-  $EntityModel::BaseClass::VERSION = '0.002';
+  $EntityModel::BaseClass::VERSION = '0.003';
 }
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';
@@ -25,7 +25,7 @@ sub new {
 		%data = @_;
 	}
 	foreach my $attr (grep { !exists $data{$_} } $class->ATTRIBS) {
-		my $def = EntityModel::Class::_attribInfo($class, $attr);
+		my $def = EntityModel::Class::_attrib_info($class, $attr);
 		if(exists $def->{default}) {
 			my $v = $def->{default};
 			$v = $v->() if ref $v ~~ 'CODE';

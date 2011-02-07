@@ -1,39 +1,40 @@
 package EntityModel::Class::Accessor;
 BEGIN {
-  $EntityModel::Class::Accessor::VERSION = '0.002';
+  $EntityModel::Class::Accessor::VERSION = '0.003';
 }
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';
 use 5.010;
 use feature ();
 
-=pod
+=head1 NAME
+
+EntityModel::Class::Accessor - generic class accessor
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+See L<EntityModel::Class>.
+
+=head1 DESCRIPTION
+
+See L<EntityModel::Class>.
 
 =cut
 
-use EntityModel::Log ':all';
-use Scalar::Util;
+=head2 add_to_class
 
-=head2 C<addToClass>
-
-Add hooks for hash accessors.
-
-=over 4
-
-=item * $pkg - Package to add accessors to
-
-=item * $k - Key
-
-=item * $v - Value
-
-=back
+Returns (method name, coderef) pairs for new methods to add.
 
 =cut
 
-sub addToClass {
+sub add_to_class {
 	my ($class, $pkg, $k, $v) = @_;
 
-	return $k => $class->methodList(
+	return $k => $class->method_list(
 		pkg => $pkg,
 		k => $k,
 		pre => $v->{pre},
@@ -46,7 +47,13 @@ sub addToClass {
 	);
 }
 
-sub methodList {
+=head2 method_list
+
+Returns the coderef for the method that should be applied to the requesting class.
+
+=cut
+
+sub method_list {
 	my ($self, %opt) = @_;	
 	my $k = delete $opt{k};
 	return sub {
@@ -65,10 +72,20 @@ sub methodList {
 		}
 		$opt{post}->($self, @_) if $opt{post};
 		return $self if @_;
-		logStack("Had readonly instance %s", $self) if Scalar::Util::readonly($self);
-		logStack("Had readonly value %s for key %s", $self->{$k}, $k) if Scalar::Util::readonly($self->{$k});
+#		logStack("Had readonly instance %s", $self) if Scalar::Util::readonly($self);
+#		logStack("Had readonly value %s for key %s", $self->{$k}, $k) if Scalar::Util::readonly($self->{$k});
 		$self->{$k};
 	};
 }
 
 1;
+
+__END__
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.
