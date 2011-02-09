@@ -7,7 +7,7 @@ use feature ();
 
 use IO::Handle;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 =head1 NAME
 
@@ -15,7 +15,7 @@ EntityModel::Class - define class definition
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

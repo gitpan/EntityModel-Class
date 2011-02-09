@@ -1,3 +1,6 @@
+0.004     2011-02-09 06:34:15 Europe/London
+	Add missing Test::Deep prerequisite to test requirements, no other code changes.
+
 0.003     2011-02-07 04:39:34 Europe/London
 	Tidy up documentation and rename camelCase methods to fit_with_perl_conventions.
 
