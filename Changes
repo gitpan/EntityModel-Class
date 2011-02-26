@@ -1,3 +1,8 @@
+0.005     2011-02-26 18:16:15 Europe/London
+	Allow watchers for EntityModel::Class::Array, raise an error if setting an array rather than going through the EntityModel::Array methods,
+	 and a minor optimisation for cases where there's no pre callback.
+	Array and hash entries now preserve the EntityModel::Array / EntityModel::Hash wrapper so that watchers can be added.
+
 0.004     2011-02-09 06:34:15 Europe/London
 	Add missing Test::Deep prerequisite to test requirements, no other code changes.
 

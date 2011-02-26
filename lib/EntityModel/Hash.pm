@@ -1,6 +1,6 @@
 package EntityModel::Hash;
 BEGIN {
-  $EntityModel::Hash::VERSION = '0.004';
+  $EntityModel::Hash::VERSION = '0.005';
 }
 use strict;
 use warnings;
@@ -14,7 +14,7 @@ EntityModel::Hash - wrapper object for dealing with hashrefs
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -111,6 +111,7 @@ Retrieves the value for the given key.
 
 sub get {
 	my ($self, $k) = @_;
+	$k //= '';
 	return $self->hashref->{$k};
 }
 

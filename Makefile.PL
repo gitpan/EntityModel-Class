@@ -10,7 +10,7 @@ use ExtUtils::MakeMaker 6.31;
 
 my %WriteMakefileArgs = (
   'ABSTRACT' => 'Helper module for generating class definitions',
-  'AUTHOR' => 'Tom Molesworth <tom@entitymodel.com>',
+  'AUTHOR' => 'Tom Molesworth <cpan@entitymodel.com>',
   'BUILD_REQUIRES' => {
     'Test::Deep' => '0',
     'Test::More' => '0'
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     'Try::Tiny' => '0',
     'parent' => '0'
   },
-  'VERSION' => '0.004',
+  'VERSION' => '0.005',
   'test' => {
     'TESTS' => 't/*.t'
   }

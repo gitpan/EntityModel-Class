@@ -1,6 +1,6 @@
 package EntityModel::Array;
 BEGIN {
-  $EntityModel::Array::VERSION = '0.004';
+  $EntityModel::Array::VERSION = '0.005';
 }
 use strict;
 use warnings;
@@ -13,7 +13,7 @@ EntityModel::Array - wrapper object for dealing with arrayrefs
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -82,7 +82,31 @@ sub push : method {
 	push @{$self->{data}}, @_;
 	if($self->{onchange}) {
 		logDebug("We have change");
-		$self->{onchange}->(add => $_) foreach @_;
+		foreach my $w (@{$self->{onchange}}) {
+			$w->(add => $_) foreach @_;
+		}
+	}
+	return $self;
+}
+
+=head2 watch
+
+Add a coderef to be called when the array changes.
+
+=cut
+
+sub add_watch : method {
+	my $self = shift;
+	$self->{onchange} ||= [];
+	push @{$self->{onchange}}, @_;
+	return $self;
+}
+
+sub remove_watch : method {
+	my $self = shift;
+	return $self unless $self->{onchange};
+	foreach my $code (@_) {
+		@{ $self->{onchange} } = grep { $_ != $code } @{ $self->{onchange} };
 	}
 	return $self;
 }
@@ -98,7 +122,9 @@ sub shift : method {
 	my $v = shift(@{$self->{data}});
 	if($self->{onchange}) {
 		logDebug("We have change");
-		$self->{onchange}->(drop => $v);
+		foreach my $w (@{$self->{onchange}}) {
+			$w->(drop => $v);
+		}
 	}
 	return $v;
 }
@@ -114,7 +140,9 @@ sub pop : method {
 	my $v = pop(@{$self->{data}});
 	if($self->{onchange}) {
 		logDebug("We have change");
-		$self->{onchange}->(drop => $v);
+		foreach my $w (@{$self->{onchange}}) {
+			$w->(drop => $v);
+		}
 	}
 	return $v;
 }
@@ -130,7 +158,9 @@ sub unshift : method {
 	my $v = unshift @{$self->{data}}, @_;
 	if($self->{onchange}) {
 		logDebug("We have change");
-		$self->{onchange}->(add => $_) foreach @_;
+		foreach my $w (@{$self->{onchange}}) {
+			$w->(add => $_) foreach @_;
+		}
 	}
 	return $v;
 }
@@ -225,7 +255,12 @@ sub remove : method {
 			$match = ($self->{data}->[$idx]) ~~ $check;
 		}
 		if($match) {
-			splice @{$self->{data}}, $idx, 1;
+			my ($el) = splice @{$self->{data}}, $idx, 1;
+			if($self->{onchange}) {
+				foreach my $w (@{$self->{onchange}}) {
+					$w->(drop => $el);
+				}
+			}
 		} else {
 			++$idx;
 		}
@@ -241,6 +276,12 @@ Empty the arrayref.
 
 sub clear : method {
 	my $self = shift;
+	if($self->{onchange}) {
+		my @el = @{ $self->{data} };
+		foreach my $w (@{$self->{onchange}}) {
+			$w->(drop => $_) for @el;
+		}
+	}
 	$self->{data} = [ ];
 	return $self;
 }

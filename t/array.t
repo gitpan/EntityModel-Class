@@ -19,7 +19,7 @@ is($x->count, 3, 'count is correct');
 cmp_deeply([ $x->list ], \@data, 'list is correct');
 
 my $hadChange = 0;
-$x = new_ok('EntityModel::Array' => [\@data, onchange => sub { $hadChange += ($_[0] eq 'add') ? 1 : -1; }]);
+$x = new_ok('EntityModel::Array' => [\@data, onchange => [ sub { $hadChange += ($_[0] eq 'add') ? 1 : -1; } ] ]);
 is($hadChange, 0, 'starts at zero');
 ok($x->push('test'), 'push value');
 is($hadChange, 1, 'now 1');

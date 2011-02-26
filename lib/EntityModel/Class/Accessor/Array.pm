@@ -1,6 +1,6 @@
 package EntityModel::Class::Accessor::Array;
 BEGIN {
-  $EntityModel::Class::Accessor::Array::VERSION = '0.004';
+  $EntityModel::Class::Accessor::Array::VERSION = '0.005';
 }
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';
@@ -20,7 +20,7 @@ EntityModel::Class::Accessor::Array - generic class accessor for arrays
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -43,24 +43,47 @@ Returns the method definition to add to the class.
 sub method_list {
 	my ($class, %opt) = @_;
 	my $k = $opt{k};
-	return sub {
-		my $self = shift;
-		if($opt{pre}) {
-			$opt{pre}->($self, @_)
-			 or return;
-		}
-		$self->{$k} ||= [ ];
-		my @watchers = map { @{ $watcher{$_}->{$k} // [] } } Class::ISA::self_and_super_path(ref $self);
-		logDebug("Watcher for [%s] method [%s] has %d entries", ref $self, $k, scalar @watchers);
-		return EntityModel::Array->new($self->{$k},
-			  (@watchers)
-			? (onchange => sub {
-				logDebug("Check [%s] for [%s]", ref $self, $k);
-				# Pass value only
-				$_->($self, @_) foreach @watchers;
-			}) : ()
-		);
-	};
+	if(my $pre = $opt{pre}) {
+		return sub {
+			my $self = shift;
+			die "Options not supported for Array" if @_;
+			$opt{pre}->($self, @_) or return;
+			unless($self->{$k}) {
+				my @watchers = map { @{ $watcher{$_}->{$k} // [] } } Class::ISA::self_and_super_path(ref $self);
+				logDebug("Watcher for [%s] method [%s] has %d entries", ref $self, $k, scalar @watchers);
+				$self->{$k} = EntityModel::Array->new($self->{$k},
+					  (@watchers)
+					? (onchange => [ sub {
+						logDebug("Check [%s] for [%s]", ref $self, $k);
+						# Pass value only
+						$_->($self, @_) foreach @watchers;
+					} ]) : ()
+				);
+			}
+			return $self->{$k};
+		};
+	} else {
+		return sub {
+			my $self = shift;
+			die "Options not supported for Array" if @_;
+			unless($self->{$k}) {
+				my @watchers = map {
+					@{ $watcher{$_}->{$k} // [] }
+				} Class::ISA::self_and_super_path(ref $self);
+
+				logDebug("Watcher for [%s] method [%s] has %d entries", ref $self, $k, scalar @watchers);
+				$self->{$k} = EntityModel::Array->new($self->{$k},
+					  (@watchers)
+					? (onchange => [ sub {
+						logDebug("Check [%s] for [%s]", ref $self, $k);
+						# Pass value only
+						$_->($self, @_) foreach @watchers;
+					} ]) : ()
+				);
+			}
+			return $self->{$k};
+		};
+	}
 }
 
 =head2 add_watcher

@@ -1,6 +1,6 @@
 package EntityModel::Class::Accessor::Hash;
 BEGIN {
-  $EntityModel::Class::Accessor::Hash::VERSION = '0.004';
+  $EntityModel::Class::Accessor::Hash::VERSION = '0.005';
 }
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';
@@ -16,7 +16,7 @@ EntityModel::Class::Accessor::Array - generic class accessor for arrays
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -39,19 +39,33 @@ Returns a hash of method definitions.
 sub method_list {
 	my ($class, %opt) = @_;
 	my $k = $opt{k};
-	return sub {
-		my $self = shift;
+	if(my $pre = $opt{pre}) {
+		return sub {
+			my $self = shift;
 
-		if($opt{pre}) {
-			$opt{pre}->($self, @_)
-			 or return;
-		}
-		if(@_) {
-			$self->{$k} = $_[0];
-		}
-		$self->{$k} ||= { };
-		return EntityModel::Hash->new($self->{$k});
-	};
+			$pre->($self, @_) or return;
+
+			if(@_) {
+				$self->{$k} = ref $_[0] eq 'HASH' ? EntityModel::Hash->new($_[0]) : $_[0];
+			}
+			unless($self->{$k}) {
+				$self->{$k} = EntityModel::Hash->new($self->{$k});
+			}
+			return $self->{$k};
+		};
+	} else {
+		return sub {
+			my $self = shift;
+
+			if(@_) {
+				$self->{$k} = ref $_[0] eq 'HASH' ? EntityModel::Hash->new($_[0]) : $_[0];
+			}
+			unless($self->{$k}) {
+				$self->{$k} = EntityModel::Hash->new($self->{$k});
+			}
+			return $self->{$k};
+		};
+	}
 }
 
 1;
