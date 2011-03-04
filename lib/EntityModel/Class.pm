@@ -7,7 +7,7 @@ use feature ();
 
 use IO::Handle;
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 =head1 NAME
 
@@ -15,7 +15,7 @@ EntityModel::Class - define class definition
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ with the exception of the following underscore-prefixed keys:
 =item * C<_vcs> - version control system information, a plain string containing information about the last
 changed revision and author for this file.
 
- use EntityModel::Class { _version => '$Id$' };
+ use EntityModel::Class { _vcs => '$Id$' };
 
 =item * C<_isa> - set up the parents for this class, similar to C<use parent>.
 
@@ -142,6 +142,8 @@ use EntityModel::Class::Accessor::Array;
 use EntityModel::Class::Accessor::Hash;
 
 my %classInfo;
+
+my %CLASS_DEFAULTS;
 
 =head2 import
 
@@ -320,6 +322,8 @@ sub apply_attributes {
 		}
 	}
 
+	$CLASS_DEFAULTS{$pkg} = [ grep { exists $info->{$_}->{default} } @attribs ];
+
 # Apply watchers after we've defined the fields - each watcher is field => method
 	foreach my $watcher (grep { exists $info->{$_}->{watch} } @attribs) {
 		my $w = $info->{$watcher}->{watch};
@@ -379,8 +383,6 @@ sub setup {
 
 	{
 		no strict 'refs';
-#		*{$pkg . '::import'} = sub { }
-#		 unless 'import' ~~ [ keys %{$pkg. '::'} ];
 		push @{$pkg . '::ISA'}, $class;
 	}
 
@@ -421,10 +423,15 @@ Returns attribute information for a given package's attribute.
 =cut
 
 sub _attrib_info {
-	my $self = shift;
+	my $class = shift;
 	my $attr = shift;
 	# return unless ref $self;
-	return $classInfo{ref $self || $self}->{$attr};
+	return $classInfo{ref $class || $class}->{$attr};
+}
+
+sub has_defaults {
+	my $class = shift;
+	return @{ $CLASS_DEFAULTS{$class} // [] };
 }
 
 =head2 add_watcher

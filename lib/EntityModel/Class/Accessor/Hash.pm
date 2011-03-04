@@ -1,6 +1,6 @@
 package EntityModel::Class::Accessor::Hash;
 BEGIN {
-  $EntityModel::Class::Accessor::Hash::VERSION = '0.005';
+  $EntityModel::Class::Accessor::Hash::VERSION = '0.006';
 }
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';
@@ -16,7 +16,7 @@ EntityModel::Class::Accessor::Array - generic class accessor for arrays
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -58,6 +58,7 @@ sub method_list {
 			my $self = shift;
 
 			if(@_) {
+				return $self->{$k}->get(@_) if @_ == 1 && !ref($_[0]);
 				$self->{$k} = ref $_[0] eq 'HASH' ? EntityModel::Hash->new($_[0]) : $_[0];
 			}
 			unless($self->{$k}) {

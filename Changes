@@ -1,3 +1,9 @@
+0.006     2011-03-04 17:12:57 Europe/London
+	Return $self from plain value accessor when changing value.
+	Don't warn about undefined values when retrieving from hash.
+	Minor performance improvements on standard accessors and for instantiating the base class.
+	Hash accessor allows non-ref single parameter to return the value for that key.
+
 0.005     2011-02-26 18:16:15 Europe/London
 	Allow watchers for EntityModel::Class::Array, raise an error if setting an array rather than going through the EntityModel::Array methods,
 	 and a minor optimisation for cases where there's no pre callback.

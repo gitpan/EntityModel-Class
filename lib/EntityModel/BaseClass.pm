@@ -1,12 +1,13 @@
 package EntityModel::BaseClass;
 BEGIN {
-  $EntityModel::BaseClass::VERSION = '0.005';
+  $EntityModel::BaseClass::VERSION = '0.006';
 }
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';
 use 5.010;
 
 use Scalar::Util ();
+use EntityModel::Log ':all';
 
 =pod
 
@@ -19,21 +20,22 @@ sub new {
 		%data = %{$_[0]};
 	} else {
 		if(@_ % 2) {
-			use EntityModel::Log ':all';
 			logStack("Bad element list for [%s] - %s", $class, join(',', map { $_ // 'undef' } @_));
 		}
 		%data = @_;
 	}
-	foreach my $attr (grep { !exists $data{$_} } $class->ATTRIBS) {
-		my $def = EntityModel::Class::_attrib_info($class, $attr);
-		if(exists $def->{default}) {
-			my $v = $def->{default};
-			$v = $v->() if ref $v ~~ 'CODE';
-			$data{$attr} = $v;
-		}
-	}
+	my $self = bless \%data, $class;
+	my @defaults = EntityModel::Class::has_defaults($class);
+	return $self unless @defaults;
 
-	bless(\%data, $class);
+	foreach my $attr (grep { !exists $data{$_} } @defaults) {
+		my $def = EntityModel::Class::_attrib_info($class, $attr);
+		my $v = $def->{default};
+		$v = $v->() if ref $v ~~ 'CODE';
+		# Still aliased to $self
+		$data{$attr} = $v;
+	}
+	return $self;
 }
 
 sub clone {

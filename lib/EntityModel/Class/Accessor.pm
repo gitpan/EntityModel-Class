@@ -1,6 +1,6 @@
 package EntityModel::Class::Accessor;
 BEGIN {
-  $EntityModel::Class::Accessor::VERSION = '0.005';
+  $EntityModel::Class::Accessor::VERSION = '0.006';
 }
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';
@@ -13,7 +13,7 @@ EntityModel::Class::Accessor - generic class accessor
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -56,26 +56,35 @@ Returns the coderef for the method that should be applied to the requesting clas
 sub method_list {
 	my ($self, %opt) = @_;	
 	my $k = delete $opt{k};
-	return sub {
-		my $self = shift;
-		die "Instance method for $k, self is " . ($self // 'undef') unless ref $self;
-		if($opt{pre}) {
-			$opt{pre}->($self, @_)
-			 or return;
-		}
-		if(@_) {
-			die $_[0] . ' is invalid' if $opt{validate} && !$opt{validate}->($_[0]);
-			my $v = shift;
+	if($opt{pre} || $opt{post}) {
+		return sub {
+			my $self = shift;
+			if($opt{pre}) {
+				$opt{pre}->($self, @_)
+				 or return;
+			}
+			if(@_) {
+				die $_[0] . ' is invalid' if $opt{validate} && !$opt{validate}->($_[0]);
+				my $v = $_[0];
+				# Readonly values can be problematic, make a copy if we can - but don't trash refs.
+				$v = "$v" if Scalar::Util::readonly($v) && !ref $v;
+				$self->{$k} = $v;
+			}
+			$opt{post}->($self, @_) if $opt{post};
+			return $self if @_;
+			$self->{$k};
+		};
+	} else {
+		return sub {
+			return $_[0]->{$k} unless @_ > 1;
+			die $_[1] . ' is invalid' if $opt{validate} && !$opt{validate}->(@_);
+			my $v = $_[1];
 			# Readonly values can be problematic, make a copy if we can - but don't trash refs.
-			$v = "$v" if Scalar::Util::readonly($self->{$k}) && !ref $v;
-			$self->{$k} = $v;
-		}
-		$opt{post}->($self, @_) if $opt{post};
-		return $self if @_;
-#		logStack("Had readonly instance %s", $self) if Scalar::Util::readonly($self);
-#		logStack("Had readonly value %s for key %s", $self->{$k}, $k) if Scalar::Util::readonly($self->{$k});
-		$self->{$k};
-	};
+			$v = "$v" if Scalar::Util::readonly($v) && !ref $v;
+			$_[0]->{$k} = $v;
+			return $_[0];
+		};
+	}
 }
 
 1;

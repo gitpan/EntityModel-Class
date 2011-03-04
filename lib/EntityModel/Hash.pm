@@ -1,6 +1,6 @@
 package EntityModel::Hash;
 BEGIN {
-  $EntityModel::Hash::VERSION = '0.005';
+  $EntityModel::Hash::VERSION = '0.006';
 }
 use strict;
 use warnings;
@@ -14,7 +14,7 @@ EntityModel::Hash - wrapper object for dealing with hashrefs
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -99,6 +99,7 @@ Deletes the given key from the hashref.
 sub erase {
 	my $self = shift;
 	my ($k) = @_;
+	$k //= '';
 	delete $self->hashref->{$k};
 	return $self;
 }
@@ -138,6 +139,7 @@ Returns true if the given key exists in the hashref.
 
 sub exists : method {
 	my ($self, $k) = @_;
+	$k //= '';
 	return exists($self->hashref->{$k});
 }
 

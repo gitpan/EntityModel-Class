@@ -10,6 +10,7 @@ use EntityModel::Class {
 package EMClass::Test;
 use EntityModel::Class {
 	string => { type => 'string' },
+	number => { type => 'data' },
 	array => { type => 'array', subclass => 'string' },
 	hash => { type => 'hash', subclass => 'string' },
 	subtype => { type => 'EMClass::Test::Sub' },
@@ -17,13 +18,16 @@ use EntityModel::Class {
 };
 
 package main;
-use Test::More tests => 19;
+use Test::More tests => 22;
 use EntityModel::Class;
 
 my $em = new_ok('EMClass::Test');
 can_ok($em, 'string');
 ok($em->string('test'), 'set string');
 is($em->string, 'test', 'string matches');
+can_ok($em, 'number');
+is($em->number(23), $em, 'set number');
+is($em->number, 23, 'number matches');
 can_ok($em, 'array');
 isa_ok($em->array, 'EntityModel::Array');
 ok($em->array->push('test'), 'push value');
