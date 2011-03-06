@@ -1,3 +1,6 @@
+0.007     2011-03-06 02:37:07 Europe/London
+	Don't set EntityModel::Class as parent for everything that uses it.
+
 0.006     2011-03-04 17:12:57 Europe/London
 	Return $self from plain value accessor when changing value.
 	Don't warn about undefined values when retrieving from hash.

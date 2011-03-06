@@ -7,7 +7,7 @@ use feature ();
 
 use IO::Handle;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 =head1 NAME
 
@@ -15,7 +15,7 @@ EntityModel::Class - define class definition
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -126,8 +126,9 @@ rather than classes or simple types.
 
 # Currently just needed for the unitcheckify helper function
 require DynaLoader;
+use AutoLoader;
 use parent qw(DynaLoader);
-bootstrap EntityModel::Class;
+bootstrap EntityModel::Class $VERSION;
 
 use Try::Tiny;
 use Scalar::Util qw(refaddr);
@@ -380,11 +381,6 @@ Standard module setup - enable strict and warnings, and disable 'import' fallthr
 
 sub setup {
 	my ($class, $pkg) = @_;
-
-	{
-		no strict 'refs';
-		push @{$pkg . '::ISA'}, $class;
-	}
 
 	strict->import;
 

@@ -1,6 +1,6 @@
 package EntityModel::Class::Accessor;
 BEGIN {
-  $EntityModel::Class::Accessor::VERSION = '0.006';
+  $EntityModel::Class::Accessor::VERSION = '0.007';
 }
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';
@@ -13,7 +13,7 @@ EntityModel::Class::Accessor - generic class accessor
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
