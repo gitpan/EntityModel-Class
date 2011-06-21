@@ -2,9 +2,9 @@
 use strict;
 use warnings;
 
-BEGIN { require 5.010; }
+use 5.010;
 
-use ExtUtils::MakeMaker 6.31;
+use ExtUtils::MakeMaker 6.30;
 
 
 
@@ -16,13 +16,14 @@ my %WriteMakefileArgs = (
     'Test::More' => '0'
   },
   'CONFIGURE_REQUIRES' => {
-    'ExtUtils::MakeMaker' => '6.31'
+    'ExtUtils::MakeMaker' => '6.30'
   },
   'DISTNAME' => 'EntityModel-Class',
   'EXE_FILES' => [],
   'LICENSE' => 'perl',
   'NAME' => 'EntityModel::Class',
   'PREREQ_PM' => {
+    'Check::UnitCheck' => '0.13',
     'DateTime' => '0',
     'DateTime::Format::Strptime' => '0',
     'EntityModel::Log' => '0.001',
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     'Try::Tiny' => '0',
     'parent' => '0'
   },
-  'VERSION' => '0.007',
+  'VERSION' => '0.008',
   'test' => {
     'TESTS' => 't/*.t'
   }

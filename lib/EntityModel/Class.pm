@@ -7,7 +7,7 @@ use feature ();
 
 use IO::Handle;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 =head1 NAME
 
@@ -15,7 +15,7 @@ EntityModel::Class - define class definition
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -124,14 +124,9 @@ rather than classes or simple types.
 
 =cut
 
-# Currently just needed for the unitcheckify helper function
-require DynaLoader;
-use AutoLoader;
-use parent qw(DynaLoader);
-bootstrap EntityModel::Class $VERSION;
-
 use Try::Tiny;
 use Scalar::Util qw(refaddr);
+use Check::UnitCheck;
 use overload;
 
 use EntityModel::Log ':all';
@@ -333,8 +328,8 @@ sub apply_attributes {
 		}
 	}
 
-# Provided as XS addition
-	unitcheckify(sub {
+# Thanks to Check::UnitCheck
+	Check::UnitCheck::unitcheckify(sub {
 		# FIXME Can't call any log functions within UNITCHECK
 		local $::DISABLE_LOG = 1;
 		my %ml = %methodList;

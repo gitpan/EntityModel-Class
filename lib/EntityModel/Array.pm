@@ -1,6 +1,6 @@
 package EntityModel::Array;
 BEGIN {
-  $EntityModel::Array::VERSION = '0.007';
+  $EntityModel::Array::VERSION = '0.008';
 }
 use strict;
 use warnings;
@@ -13,7 +13,7 @@ EntityModel::Array - wrapper object for dealing with arrayrefs
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -56,7 +56,12 @@ Returns the number of items in the arrayref.
 
 sub count {
 	my $self = shift;
-	return scalar @{$self->{data}};
+	my $count = scalar @{$self->{data}};
+	if(@_) {
+		$_->($count) for @_;
+		return $self;
+	}
+	return $count;
 }
 
 =head2 C<list>
@@ -81,7 +86,6 @@ sub push : method {
 	my $self = shift;
 	push @{$self->{data}}, @_;
 	if($self->{onchange}) {
-		logDebug("We have change");
 		foreach my $w (@{$self->{onchange}}) {
 			$w->(add => $_) foreach @_;
 		}
@@ -121,7 +125,6 @@ sub shift : method {
 	my $self = shift;
 	my $v = shift(@{$self->{data}});
 	if($self->{onchange}) {
-		logDebug("We have change");
 		foreach my $w (@{$self->{onchange}}) {
 			$w->(drop => $v);
 		}
@@ -139,7 +142,6 @@ sub pop : method {
 	my $self = shift;
 	my $v = pop(@{$self->{data}});
 	if($self->{onchange}) {
-		logDebug("We have change");
 		foreach my $w (@{$self->{onchange}}) {
 			$w->(drop => $v);
 		}
@@ -157,7 +159,6 @@ sub unshift : method {
 	my $self = shift;
 	my $v = unshift @{$self->{data}}, @_;
 	if($self->{onchange}) {
-		logDebug("We have change");
 		foreach my $w (@{$self->{onchange}}) {
 			$w->(add => $_) foreach @_;
 		}
@@ -173,7 +174,13 @@ Joins the entries in the arrayref using the given value and returns as a scalar.
 
 sub join : method {
 	my $self = shift;
-	return join(shift, @{$self->{data}});
+	my $sep = shift;
+	my $joined = join($sep, @{$self->{data}});
+	if(@_) {
+		$_->($joined) for @_;
+		return $self;
+	}
+	return $joined;
 }
 
 =head2 C<each>
@@ -184,9 +191,7 @@ Perform coderef on each entry in the arrayref.
 
 sub each : method {
 	my ($self, $code) = @_;
-	foreach my $v (@{$self->{data}}) {
-		$code->($v);
-	}
+	$code->($_) for @{$self->{data}};
 	return $self;
 }
 
@@ -197,14 +202,12 @@ Returns the first entry in the arrayref.
 =cut
 
 sub first {
-	my ($self, $match) = @_;
-	return $self->{data}[0] unless defined $match;
-	if(ref $match eq 'CODE') {
-		my ($first) = grep { $match->($_) } @{$self->{data}};
-		return $first;
+	my $self = shift;
+	if(@_) {
+		$_->($self->{data}[0]) for @_;
+		return $self;
 	}
-	my ($first) = grep $match, @{$self->{data}};
-	return $first;
+	return $self->{data}[0];
 }
 
 =head2 C<last>
@@ -214,14 +217,12 @@ Returns the last entry in the arrayref.
 =cut
 
 sub last {
-	my ($self, $match) = @_;
-	return $self->{data}[-1] unless defined $match;
-	if(ref $match eq 'CODE') {
-		my ($last) = reverse grep { $match->($_) } @{$self->{data}};
-		return $last;
+	my $self = shift;
+	if(@_) {
+		$_->($self->{data}[-1]) for @_;
+		return $self;
 	}
-	my ($last) = reverse grep $match, @{$self->{data}};
-	return $last;
+	return $self->{data}[-1];
 }
 
 =head2 C<grep>
@@ -232,7 +233,7 @@ Calls the coderef on each entry in the arrayref and returns the entries for whic
 
 sub grep : method {
 	my ($self, $match) = @_;
-	return grep { $match->($_) } @{$self->{data}};
+	return ref($self)->new([ grep { $match->($_) } @{$self->{data}} ]);
 }
 
 =head2 C<remove>
