@@ -1,6 +1,6 @@
 package EntityModel::BaseClass;
-BEGIN {
-  $EntityModel::BaseClass::VERSION = '0.008';
+{
+  $EntityModel::BaseClass::VERSION = '0.009';
 }
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';

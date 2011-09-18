@@ -7,7 +7,7 @@ use feature ();
 
 use IO::Handle;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 =head1 NAME
 
@@ -15,7 +15,7 @@ EntityModel::Class - define class definition
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -235,12 +235,13 @@ sub load_dependencies {
 			logDebug("Already in INC: $file");
 			next;
 		}
-		eval {
+		try {
 			logDebug("Not found: $file") unless -f $file && -r $file;
 			require $file;
 #			eval "package $pkg; $c->import;package $class;";
+		} catch {
+			logWarning($_) unless /^Can't locate /;
 		};
-		logWarning($@) if $@;
 	}
 }
 

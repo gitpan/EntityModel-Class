@@ -1,6 +1,6 @@
 package EntityModel::Error;
-BEGIN {
-  $EntityModel::Error::VERSION = '0.008';
+{
+  $EntityModel::Error::VERSION = '0.009';
 }
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';
@@ -12,7 +12,7 @@ EntityModel::Error - generic error object
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -27,13 +27,13 @@ Uses some overload tricks and L<AUTOLOAD> to allow chained method calls without 
 =cut
 
 use EntityModel::Log ':all';
+use Data::Dumper;
 
 use overload
 	'bool' => sub {
 		my $self = shift;
-		use Data::Dumper;
 		logWarning('Error: [%s], chain was [%s]',
-			Dumper($self->{message}),
+			Data::Dumper::Dumper($self->{message}),
 			join(',', map {
 				$_->{method} // 'unknown'
 			} @{ $self->{chain} })
@@ -46,11 +46,12 @@ use overload
 
 sub new {
 	my ($class, $parent, $msg, $opt) = @_;
+	$msg = $parent if @_ < 3;
 	$opt ||= { };
 
 	logWarning($msg) if $opt->{warning};
 	logError($msg) if $opt->{error};
-	logStack("Had error [%s]", $msg);
+	logInfo("Had error [%s] from %S", $msg);
 
 	my $self = bless {
 		message		=> $msg,

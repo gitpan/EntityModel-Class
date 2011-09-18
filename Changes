@@ -1,3 +1,7 @@
+0.009     2011-09-18 23:40:36 Europe/London
+	Fix EntityModel::Error handling to work with latest EntityModel::Log.
+	Added extract_by implementation as one of the array helpers.
+
 0.008     2011-06-21 21:12:44 Europe/London
 	Make the EntityModel::Array handling work in a more asynchronous-friendly manner. Changes
 	 ->grep, ->first, ->last etc.

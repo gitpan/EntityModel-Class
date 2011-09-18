@@ -1,6 +1,6 @@
 package EntityModel::Array;
-BEGIN {
-  $EntityModel::Array::VERSION = '0.008';
+{
+  $EntityModel::Array::VERSION = '0.009';
 }
 use strict;
 use warnings;
@@ -13,7 +13,7 @@ EntityModel::Array - wrapper object for dealing with arrayrefs
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -307,6 +307,14 @@ Returns true if there's nothing in the arrayref.
 sub is_empty {
 	my $self = shift;
 	return !$self->count;
+}
+
+sub extract_by {
+	my $self = shift;
+	my $code = shift;
+	my @out;
+	push @out, splice @{ $self->{data} }, $_, 1 for grep $code->($self->{data}[$_]), 0..$#{$self->{data}};
+	return @out;
 }
 
 1;

@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use 5.10.0;
+use Test::More;
 
 package EMClass::Test::Sub;
 use EntityModel::Class {

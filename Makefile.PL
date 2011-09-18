@@ -9,35 +9,35 @@ use ExtUtils::MakeMaker 6.30;
 
 
 my %WriteMakefileArgs = (
-  'ABSTRACT' => 'Helper module for generating class definitions',
-  'AUTHOR' => 'Tom Molesworth <cpan@entitymodel.com>',
-  'BUILD_REQUIRES' => {
-    'Test::Deep' => '0',
-    'Test::More' => '0'
+  "ABSTRACT" => "Helper module for generating class definitions",
+  "AUTHOR" => "Tom Molesworth <cpan\@entitymodel.com>",
+  "BUILD_REQUIRES" => {
+    "Test::Deep" => 0,
+    "Test::More" => 0
   },
-  'CONFIGURE_REQUIRES' => {
-    'ExtUtils::MakeMaker' => '6.30'
+  "CONFIGURE_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "6.30"
   },
-  'DISTNAME' => 'EntityModel-Class',
-  'EXE_FILES' => [],
-  'LICENSE' => 'perl',
-  'NAME' => 'EntityModel::Class',
-  'PREREQ_PM' => {
-    'Check::UnitCheck' => '0.13',
-    'DateTime' => '0',
-    'DateTime::Format::Strptime' => '0',
-    'EntityModel::Log' => '0.001',
-    'Exporter' => '0',
-    'IO::Handle' => '0',
-    'List::Util' => '0',
-    'Tie::Cache::LRU' => '0',
-    'Time::HiRes' => '0',
-    'Try::Tiny' => '0',
-    'parent' => '0'
+  "DISTNAME" => "EntityModel-Class",
+  "EXE_FILES" => [],
+  "LICENSE" => "perl",
+  "NAME" => "EntityModel::Class",
+  "PREREQ_PM" => {
+    "Check::UnitCheck" => "0.13",
+    "DateTime" => 0,
+    "DateTime::Format::Strptime" => 0,
+    "EntityModel::Log" => "0.004",
+    "Exporter" => 0,
+    "IO::Handle" => 0,
+    "List::Util" => 0,
+    "Tie::Cache::LRU" => 0,
+    "Time::HiRes" => 0,
+    "Try::Tiny" => 0,
+    "parent" => 0
   },
-  'VERSION' => '0.008',
-  'test' => {
-    'TESTS' => 't/*.t'
+  "VERSION" => "0.009",
+  "test" => {
+    "TESTS" => "t/*.t"
   }
 );
 
