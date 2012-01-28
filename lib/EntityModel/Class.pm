@@ -7,7 +7,7 @@ use feature ();
 
 use IO::Handle;
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 =head1 NAME
 
@@ -15,7 +15,7 @@ EntityModel::Class - define class definition
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -308,6 +308,10 @@ sub apply_attributes {
 				return 1;
 			});
 		}
+
+		# Update overload cache if we previously invalidated (for smartmatch or other operators),
+		# possibly required if calling L<apply_attributes> at runtime.
+		bless {}, $pkg;
 	}
 
 # Anything else is an accessor, set it up
