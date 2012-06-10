@@ -1,6 +1,6 @@
 package EntityModel::Class::Accessor::Array;
 {
-  $EntityModel::Class::Accessor::Array::VERSION = '0.010';
+  $EntityModel::Class::Accessor::Array::VERSION = '0.011';
 }
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';
@@ -20,7 +20,7 @@ EntityModel::Class::Accessor::Array - generic class accessor for arrays
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

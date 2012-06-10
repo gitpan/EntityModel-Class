@@ -1,3 +1,7 @@
+0.011     2012-06-10 16:17:36 Europe/London
+	Use Module::Load instead of require when attempting to load dependencies.
+	Bug fixed: make sure we load ISA modules
+
 0.010     2012-01-28 18:19:23 Europe/London
 	Attempt to clear and reapply overloading state after setting smart match operator.
 

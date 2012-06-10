@@ -67,10 +67,11 @@ plan tests => 1;
 my $tmpdir = File::Temp->newdir;
 
 my $pid = fork;
-if(!defined $pid) {
-	fail "Forking failed!";
-	exit 1;
-} elsif($pid) {
+if($pid) {
+    unless(defined $pid) {
+        fail "Forking failed!";
+        exit 1;
+    }
     waitpid $pid, 0;
     ok !$?, "cpanm should successfully install your dist with no issues";
 } else {
@@ -78,7 +79,7 @@ if(!defined $pid) {
     close STDERR;
 
     chdir File::Spec->catdir($FindBin::Bin,
-        File::Spec->updir); # exit test directory
+        File::Spec->updir, File::Spec->updir); # exit test directory
 
     exec 'perl', $cpanm_path, '-L', $tmpdir->dirname, '.';
 }

@@ -7,7 +7,7 @@ use feature ();
 
 use IO::Handle;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 =head1 NAME
 
@@ -15,7 +15,7 @@ EntityModel::Class - define class definition
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -127,6 +127,7 @@ rather than classes or simple types.
 use Try::Tiny;
 use Scalar::Util qw(refaddr);
 use Check::UnitCheck;
+use Module::Load;
 use overload;
 
 use EntityModel::Log ':all';
@@ -208,11 +209,9 @@ sub apply_inheritance {
 # Inheritance
 	my @inheritFrom = @{ $info->{_isa} // [] };
 	push @inheritFrom, 'EntityModel::BaseClass';
-	foreach my $parent (@inheritFrom) {
-		my $file = $parent;
-		$file =~ s{::|'}{/}g;
-		require $file . '.pm';
-	}
+	# TODO we want to skip loading if the module has already been loaded or defined
+	# earlier, but there is probably a cleaner way to do this?
+	Module::Load::load($_) for grep !$pkg->isa($_), @inheritFrom;
 	{ no strict 'refs'; push @{$pkg . '::ISA'}, @inheritFrom; }
 	delete $info->{_isa};
 }
@@ -227,20 +226,20 @@ sub load_dependencies {
 	my ($class, $pkg, $info) = @_;
 	my @attribs = grep { !/^_/ && !/~~/ } keys %$info;
 	my @classList = grep { $_ && /:/ } map { $info->{$_}->{subclass} // $info->{$_}->{type} } grep { !$info->{$_}->{defer} } @attribs;
+	CLASS:
 	foreach my $c (@classList) {
 		my $file = $c;
 		$file =~ s{::|'}{/}g;
 		$file .= '.pm';
 		if($INC{$file}) {
 			logDebug("Already in INC: $file");
-			next;
+			next CLASS;
 		}
 		try {
-			logDebug("Not found: $file") unless -f $file && -r $file;
-			require $file;
+			Module::Load::load($c);
 #			eval "package $pkg; $c->import;package $class;";
 		} catch {
-			logWarning($_) unless /^Can't locate /;
+			logError($_) unless /^Can't locate /;
 		};
 	}
 }

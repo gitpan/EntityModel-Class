@@ -1,6 +1,6 @@
 package EntityModel::Array;
 {
-  $EntityModel::Array::VERSION = '0.010';
+  $EntityModel::Array::VERSION = '0.011';
 }
 use strict;
 use warnings;
@@ -13,7 +13,7 @@ EntityModel::Array - wrapper object for dealing with arrayrefs
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

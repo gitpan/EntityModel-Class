@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "Try::Tiny" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.010",
+  "VERSION" => "0.011",
   "test" => {
     "TESTS" => "t/*.t"
   }
