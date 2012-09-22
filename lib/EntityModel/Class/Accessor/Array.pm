@@ -1,6 +1,6 @@
 package EntityModel::Class::Accessor::Array;
 {
-  $EntityModel::Class::Accessor::Array::VERSION = '0.011';
+  $EntityModel::Class::Accessor::Array::VERSION = '0.012';
 }
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';
@@ -20,11 +20,7 @@ EntityModel::Class::Accessor::Array - generic class accessor for arrays
 
 =head1 VERSION
 
-version 0.011
-
-=head1 SYNOPSIS
-
-See L<EntityModel::Class>.
+version 0.012
 
 =head1 DESCRIPTION
 
@@ -74,11 +70,12 @@ sub method_list {
 				logDebug("Watcher for [%s] method [%s] has %d entries", ref $self, $k, scalar @watchers);
 				$self->{$k} = EntityModel::Array->new($self->{$k},
 					  (@watchers)
-					? (onchange => [ sub {
+					? (onchange => [ $self->sap(sub {
+						my $self = shift;
 						logDebug("Check [%s] for [%s]", ref $self, $k);
 						# Pass value only
 						$_->($self, @_) foreach @watchers;
-					} ]) : ()
+					}) ]) : ()
 				);
 			}
 			return $self->{$k};

@@ -1,6 +1,6 @@
 package EntityModel::Class::Accessor;
 {
-  $EntityModel::Class::Accessor::VERSION = '0.011';
+  $EntityModel::Class::Accessor::VERSION = '0.012';
 }
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';
@@ -13,11 +13,7 @@ EntityModel::Class::Accessor - generic class accessor
 
 =head1 VERSION
 
-version 0.011
-
-=head1 SYNOPSIS
-
-See L<EntityModel::Class>.
+version 0.012
 
 =head1 DESCRIPTION
 
@@ -54,7 +50,7 @@ Returns the coderef for the method that should be applied to the requesting clas
 =cut
 
 sub method_list {
-	my ($self, %opt) = @_;	
+	my ($self, %opt) = @_;
 	my $k = delete $opt{k};
 	if($opt{pre} || $opt{post}) {
 		return sub {

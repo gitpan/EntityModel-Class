@@ -1,13 +1,13 @@
 package EntityModel::Class;
 # ABSTRACT: Helper module for generating class definitions
 use strict;
-use warnings FATAL => 'all', NONFATAL => 'redefine';
+use warnings;
 use 5.010;
 use feature ();
 
 use IO::Handle;
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
 =head1 NAME
 
@@ -15,24 +15,22 @@ EntityModel::Class - define class definition
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
  package Thing;
  use EntityModel::Class {
-	_isa => [ 'ThingBase' ],
 	name => 'string',
  	items => { type => 'array', subclass => 'string' }
  };
 
  package main;
- my $thing = Thing->new();
+ my $thing = Thing->new;
  $thing->name('A thing');
  $thing->items->push('an entry');
  $thing->items->push('another entry');
  print "Have " . $thing->items->count . " items\n";
- 1;
 
 =head1 DESCRIPTION
 
@@ -282,7 +280,7 @@ sub apply_version {
 	}
 }
 
-=head2 C<apply_attributes>
+=head2 apply_attributes
 
 =cut
 
@@ -342,7 +340,7 @@ sub apply_attributes {
 	}) if %methodList;
 }
 
-=head2 C<add_method>
+=head2 add_method
 
 =cut
 
@@ -383,8 +381,7 @@ sub setup {
 
 	strict->import;
 
-# Currently 'redefine' is non-fatal, although perhaps this isn't strict enough
-	warnings->import(FATAL => 'all', NONFATAL => 'redefine');
+	warnings->import();
 	feature->import(':5.10');
 	Try::Tiny->export_to_level(2); # package -> import -> setup
 
@@ -423,6 +420,12 @@ sub _attrib_info {
 	# return unless ref $self;
 	return $classInfo{ref $class || $class}->{$attr};
 }
+
+=head2 has_defaults
+
+Returns any defaults defined for this class.
+
+=cut
 
 sub has_defaults {
 	my $class = shift;

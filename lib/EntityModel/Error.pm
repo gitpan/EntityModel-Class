@@ -1,6 +1,6 @@
 package EntityModel::Error;
 {
-  $EntityModel::Error::VERSION = '0.011';
+  $EntityModel::Error::VERSION = '0.012';
 }
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';
@@ -12,11 +12,7 @@ EntityModel::Error - generic error object
 
 =head1 VERSION
 
-version 0.011
-
-=head1 SYNOPSIS
-
-See L<EntityModel::Class>.
+version 0.012
 
 =head1 DESCRIPTION
 
@@ -43,6 +39,22 @@ use overload
 	'ne' => sub { 1 },
 	'eq' => sub { 0 },
 	'fallback' => 1;
+
+=head2 new
+
+Instantiate a new L<EntityModel::Error> object. Takes the following parameters:
+
+=over 4
+
+=item * $parent - the parent error which raised this one
+
+=item * $msg - error message, string
+
+=item * $opt (optional) - hashref of options
+
+=back
+
+=cut
 
 sub new {
 	my ($class, $parent, $msg, $opt) = @_;

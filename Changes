@@ -1,3 +1,6 @@
+0.012     2012-09-22 12:13:02 Europe/London
+	Fix leak due to $self in closure on array watchers.
+
 0.011     2012-06-10 16:17:36 Europe/London
 	Use Module::Load instead of require when attempting to load dependencies.
 	Bug fixed: make sure we load ISA modules

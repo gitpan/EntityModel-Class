@@ -1,6 +1,6 @@
 package EntityModel::BaseClass;
 {
-  $EntityModel::BaseClass::VERSION = '0.011';
+  $EntityModel::BaseClass::VERSION = '0.012';
 }
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';
@@ -9,7 +9,11 @@ use 5.010;
 use Scalar::Util ();
 use EntityModel::Log ':all';
 
-=pod
+=head2 new
+
+Basic constructor. Will populate $self with any parameters passed.
+
+Returns the new instance.
 
 =cut
 
@@ -38,12 +42,20 @@ sub new {
 	return $self;
 }
 
+=head2 clone
+
+Shallow clone implementation.
+
+Returns a new instance with a copy of everything in the hashref.
+
+=cut
+
 sub clone {
 	my $self = shift;
 	return bless { %$self }, ref $self;
 }
 
-=head2 C<dump>
+=head2 dump
 
 Simple method to dump out this object and all attributes.
 
@@ -76,7 +88,7 @@ sub dump {
 	$self;
 }
 
-=head2 C<sap>
+=head2 sap
 
 Generate a coderef that takes a weakened value of $self.
 

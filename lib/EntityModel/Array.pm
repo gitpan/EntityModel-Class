@@ -1,6 +1,6 @@
 package EntityModel::Array;
 {
-  $EntityModel::Array::VERSION = '0.011';
+  $EntityModel::Array::VERSION = '0.012';
 }
 use strict;
 use warnings;
@@ -13,11 +13,7 @@ EntityModel::Array - wrapper object for dealing with arrayrefs
 
 =head1 VERSION
 
-version 0.011
-
-=head1 SYNOPSIS
-
-See L<EntityModel::Class>.
+version 0.012
 
 =head1 DESCRIPTION
 
@@ -34,7 +30,7 @@ use overload
 	},
 	fallback => 1;
 
-=head2 C<new>
+=head2 new
 
 Instantiates with the given arrayref
 
@@ -48,7 +44,7 @@ sub new {
 	}, $class;
 }
 
-=head2 C<count>
+=head2 count
 
 Returns the number of items in the arrayref.
 
@@ -64,7 +60,7 @@ sub count {
 	return $count;
 }
 
-=head2 C<list>
+=head2 list
 
 Returns all items from the arrayref.
 
@@ -76,7 +72,7 @@ sub list {
 	return @{$self->{data}};
 }
 
-=head2 C<push>
+=head2 push
 
 Push the requested value onto the end of the arrayref.
 
@@ -93,7 +89,7 @@ sub push : method {
 	return $self;
 }
 
-=head2 watch
+=head2 add_watch
 
 Add a coderef to be called when the array changes.
 
@@ -106,6 +102,14 @@ sub add_watch : method {
 	return $self;
 }
 
+=head2 remove_watch : method
+
+Removes a watch from this array.
+
+Returns $self.
+
+=cut
+
 sub remove_watch : method {
 	my $self = shift;
 	return $self unless $self->{onchange};
@@ -115,7 +119,7 @@ sub remove_watch : method {
 	return $self;
 }
 
-=head2 C<shift>
+=head2 shift
 
 Shift the first value out of the arrayref.
 
@@ -132,7 +136,7 @@ sub shift : method {
 	return $v;
 }
 
-=head2 C<pop>
+=head2 pop
 
 Pops the last value from the arrayref.
 
@@ -149,7 +153,7 @@ sub pop : method {
 	return $v;
 }
 
-=head2 C<unshift>
+=head2 unshift
 
 Unshifts a value onto the start of the arrayref.
 
@@ -166,7 +170,7 @@ sub unshift : method {
 	return $v;
 }
 
-=head2 C<join>
+=head2 join
 
 Joins the entries in the arrayref using the given value and returns as a scalar.
 
@@ -183,7 +187,7 @@ sub join : method {
 	return $joined;
 }
 
-=head2 C<each>
+=head2 each
 
 Perform coderef on each entry in the arrayref.
 
@@ -195,7 +199,7 @@ sub each : method {
 	return $self;
 }
 
-=head2 C<first>
+=head2 first
 
 Returns the first entry in the arrayref.
 
@@ -210,7 +214,7 @@ sub first {
 	return $self->{data}[0];
 }
 
-=head2 C<last>
+=head2 last
 
 Returns the last entry in the arrayref.
 
@@ -225,7 +229,7 @@ sub last {
 	return $self->{data}[-1];
 }
 
-=head2 C<grep>
+=head2 grep
 
 Calls the coderef on each entry in the arrayref and returns the entries for which it returns true.
 
@@ -236,7 +240,7 @@ sub grep : method {
 	return ref($self)->new([ grep { $match->($_) } @{$self->{data}} ]);
 }
 
-=head2 C<remove>
+=head2 remove
 
 Remove entries from the array.
 
@@ -269,7 +273,7 @@ sub remove : method {
 	return $self;
 }
 
-=head2 C<clear>
+=head2 clear
 
 Empty the arrayref.
 
@@ -287,7 +291,7 @@ sub clear : method {
 	return $self;
 }
 
-=head2 C<arrayref>
+=head2 arrayref
 
 Returns the arrayref directly.
 
@@ -298,7 +302,7 @@ sub arrayref {
 	return $self->{data};
 }
 
-=head2 C<is_empty>
+=head2 is_empty
 
 Returns true if there's nothing in the arrayref.
 
@@ -307,14 +311,6 @@ Returns true if there's nothing in the arrayref.
 sub is_empty {
 	my $self = shift;
 	return !$self->count;
-}
-
-sub extract_by {
-	my $self = shift;
-	my $code = shift;
-	my @out;
-	push @out, splice @{ $self->{data} }, $_, 1 for grep $code->($self->{data}[$_]), 0..$#{$self->{data}};
-	return @out;
 }
 
 1;

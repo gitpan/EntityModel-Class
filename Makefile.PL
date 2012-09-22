@@ -13,7 +13,7 @@ my %WriteMakefileArgs = (
   "AUTHOR" => "Tom Molesworth <cpan\@entitymodel.com>",
   "BUILD_REQUIRES" => {
     "Test::Deep" => 0,
-    "Test::More" => "0.88"
+    "Test::More" => "0.98"
   },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.30"
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "Try::Tiny" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
