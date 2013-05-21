@@ -1,3 +1,8 @@
+0.013     2013-05-21 02:44:22 Europe/London
+	* Drop smartmatch. It seems to be going away in 5.18+.
+	* Drop trim and restring helper functions.
+	* Provide splice method for arrays
+
 0.012     2012-09-22 12:13:02 Europe/London
 	Fix leak due to $self in closure on array watchers.
 

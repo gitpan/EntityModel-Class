@@ -1,6 +1,6 @@
 package EntityModel::Error;
 {
-  $EntityModel::Error::VERSION = '0.012';
+  $EntityModel::Error::VERSION = '0.013';
 }
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';
@@ -12,11 +12,11 @@ EntityModel::Error - generic error object
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 DESCRIPTION
 
-Uses some overload tricks and L<AUTOLOAD> to allow chained method calls without needing to wrap in eval.
+Uses some overload tricks and C< AUTOLOAD > to allow chained method calls without needing to wrap in eval.
 
 =head1 METHODS
 

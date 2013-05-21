@@ -11,10 +11,7 @@ use ExtUtils::MakeMaker 6.30;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Helper module for generating class definitions",
   "AUTHOR" => "Tom Molesworth <cpan\@entitymodel.com>",
-  "BUILD_REQUIRES" => {
-    "Test::Deep" => 0,
-    "Test::More" => "0.98"
-  },
+  "BUILD_REQUIRES" => {},
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.30"
   },
@@ -24,23 +21,37 @@ my %WriteMakefileArgs = (
   "NAME" => "EntityModel::Class",
   "PREREQ_PM" => {
     "Check::UnitCheck" => "0.13",
-    "DateTime" => 0,
-    "DateTime::Format::Strptime" => 0,
     "EntityModel::Log" => "0.004",
     "Exporter" => 0,
     "IO::Handle" => 0,
     "List::Util" => 0,
-    "Tie::Cache::LRU" => 0,
-    "Time::HiRes" => 0,
+    "Mixin::Event::Dispatch" => "1.000",
     "Try::Tiny" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.012",
+  "TEST_REQUIRES" => {
+    "Test::Deep" => 0,
+    "Test::More" => "0.98"
+  },
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
+
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
+  my $tr = delete $WriteMakefileArgs{TEST_REQUIRES};
+  my $br = $WriteMakefileArgs{BUILD_REQUIRES};
+  for my $mod ( keys %$tr ) {
+    if ( exists $br->{$mod} ) {
+      $br->{$mod} = $tr->{$mod} if $tr->{$mod} > $br->{$mod};
+    }
+    else {
+      $br->{$mod} = $tr->{$mod};
+    }
+  }
+}
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
   my $br = delete $WriteMakefileArgs{BUILD_REQUIRES};

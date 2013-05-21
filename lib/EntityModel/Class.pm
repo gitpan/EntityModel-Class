@@ -7,7 +7,7 @@ use feature ();
 
 use IO::Handle;
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 =head1 NAME
 
@@ -15,7 +15,7 @@ EntityModel::Class - define class definition
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 
@@ -165,7 +165,8 @@ sub import {
 	my $called_on = shift;
 	my $pkg = caller(0);
 
-	my $info = (ref $_[0] ~~ 'HASH') ? $_[0] : { @_ };  # support list of args or hashref
+	my $info = (ref($_[0]) && ref($_[0]) eq 'HASH') ? $_[0] : { @_ };  # support list of args or hashref
+
 	# Expand 'string' to { type => 'string' }
 	$_ = { type => $_ } foreach grep { !ref($_) && /^[a-z]/i } values %$info;
 
@@ -313,10 +314,13 @@ sub apply_attributes {
 
 # Anything else is an accessor, set it up
 	foreach my $attr (@attribs) {
-		given($info->{$attr}->{type}) {
-			when('array') { %methodList = (%methodList, EntityModel::Class::Accessor::Array->add_to_class($pkg, $attr => $info->{$attr})) }
-			when('hash') { %methodList = (%methodList, EntityModel::Class::Accessor::Hash->add_to_class($pkg, $attr => $info->{$attr})) }
-			default { %methodList = (%methodList, EntityModel::Class::Accessor->add_to_class($pkg, $attr => $info->{$attr})) }
+		my $type = $info->{$attr}->{type};
+		if($type eq 'array') {
+			%methodList = (%methodList, EntityModel::Class::Accessor::Array->add_to_class($pkg, $attr => $info->{$attr}))
+		} elsif($type eq 'hash') {
+			%methodList = (%methodList, EntityModel::Class::Accessor::Hash->add_to_class($pkg, $attr => $info->{$attr}))
+		} else {
+			%methodList = (%methodList, EntityModel::Class::Accessor->add_to_class($pkg, $attr => $info->{$attr}))
 		}
 	}
 
@@ -404,7 +408,7 @@ sub validator {
 	my $allowed = $v->{valid};
 	return defined $allowed
 	 ? ref $allowed eq 'CODE'
-	 ? $allowed : sub { $_[0] ~~ $allowed }
+	 ? $allowed : sub { $_[0] eq $allowed }
 	 : undef;
 }
 
@@ -451,60 +455,21 @@ sub add_watcher {
 		return unless $v;
 		my $k = $meth ? $v->$meth : $v;
 		logDebug("%s for %s with %s", $action, $k, $v);
-		given($action) {
-			when('add') {
-				$self->$obj->set($k, $v);
-			}
-			when('drop') {
-				$self->$obj->erase($k);
-			}
-			default { logError("Don't know %s", $_); }
+		if($action eq 'add') {
+			$self->$obj->set($k, $v);
+		} elsif($action eq 'drop') {
+			$self->$obj->erase($k);
+		} else {
+			logError("Don't know %s", $_);
 		}
 		return $self;
 	};
 
-	given($attrDef->{type}) {
-		when('array') {
-			EntityModel::Class::Accessor::Array->add_watcher($pkg, $target, $sub);
-		}
-		default { die "Unknown type " . ($_ // 'undef'); }
+	if($attrDef->{type} eq 'array') {
+		EntityModel::Class::Accessor::Array->add_watcher($pkg, $target, $sub);
+	} else {
+		die "Unknown type " . ($_ // 'undef');
 	}
-}
-
-=head1 IMPORTED FUNCTIONS
-
-The following functions will be added to the namespace of the importing package.
-
-=head2 trim
-
-Helper function to trim all leading and trailing whitespace from the given string.
-
-=cut
-
-sub trim { my $str = shift; return '' unless defined $str && length("$str"); $str =~ s/^\s*(.*?)\s*$/$1/gs; return $str; }
-
-=head2 now
-
-Get L<DateTime> value for current time
-
-=cut
-
-sub now { DateTime->from_epoch(epoch => Time::HiRes::time); }
-
-=head2 restring
-
-Helper method for expanding a string
-
-=cut
-
-sub restring {
-	my $str = shift;
-	return
-	  (ref($_[0]) ~~ /^CODE/)
-	? ($str . ($_[0]->()))
-	: ((@_ > 0)
-	? sprintf($str, map { $_ // 'undef' } @_)
-	: $str);
 }
 
 1;
@@ -529,4 +494,4 @@ Tom Molesworth <cpan@entitymodel.com>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2008-2013. Licensed under the same terms as Perl itself.

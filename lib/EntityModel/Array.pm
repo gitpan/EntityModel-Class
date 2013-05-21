@@ -1,10 +1,11 @@
 package EntityModel::Array;
 {
-  $EntityModel::Array::VERSION = '0.012';
+  $EntityModel::Array::VERSION = '0.013';
 }
 use strict;
 use warnings;
 use 5.010;
+use parent qw(Mixin::Event::Dispatch);
 use EntityModel::Log ':all';
 
 =head1 NAME
@@ -13,7 +14,7 @@ EntityModel::Array - wrapper object for dealing with arrayrefs
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 DESCRIPTION
 
@@ -40,13 +41,17 @@ sub new {
 	my ($class, $data, %opt) = @_;
 	bless {
 		%opt,
-		data => ($data // [ ]),
+		data => ($data || [ ]),
 	}, $class;
 }
 
 =head2 count
 
-Returns the number of items in the arrayref.
+Returns the number of items in the arrayref if called
+without parameters. This is the recommended usage.
+
+If passed a coderef, will call that coderef with the count,
+and return $self instead.
 
 =cut
 
@@ -81,12 +86,31 @@ Push the requested value onto the end of the arrayref.
 sub push : method {
 	my $self = shift;
 	push @{$self->{data}}, @_;
+	$self->invoke_event(push => @_);
 	if($self->{onchange}) {
 		foreach my $w (@{$self->{onchange}}) {
 			$w->(add => $_) foreach @_;
 		}
 	}
 	return $self;
+}
+
+=head2 splice
+
+Support for the L<perlfunc/splice> operation.
+
+Takes an offset, length and zero or more items, splices those into the array,
+invokes the C< splice > event, then returns $self.
+
+=cut
+
+sub splice : method {
+	my $self = shift;
+	my $offset = shift;
+	my $length = shift;
+	splice @{$self->{data}}, $offset, $length, @_;
+	$self->invoke_event(splice => $offset, $length, @_);
+	$self
 }
 
 =head2 add_watch
@@ -128,6 +152,7 @@ Shift the first value out of the arrayref.
 sub shift : method {
 	my $self = shift;
 	my $v = shift(@{$self->{data}});
+	$self->invoke_event(shift => $v);
 	if($self->{onchange}) {
 		foreach my $w (@{$self->{onchange}}) {
 			$w->(drop => $v);
@@ -145,6 +170,7 @@ Pops the last value from the arrayref.
 sub pop : method {
 	my $self = shift;
 	my $v = pop(@{$self->{data}});
+	$self->invoke_event(pop => $v);
 	if($self->{onchange}) {
 		foreach my $w (@{$self->{onchange}}) {
 			$w->(drop => $v);
@@ -162,12 +188,13 @@ Unshifts a value onto the start of the arrayref.
 sub unshift : method {
 	my $self = shift;
 	my $v = unshift @{$self->{data}}, @_;
+	$self->invoke_event(unshift => @_);
 	if($self->{onchange}) {
 		foreach my $w (@{$self->{onchange}}) {
 			$w->(add => $_) foreach @_;
 		}
 	}
-	return $v;
+	return $self;
 }
 
 =head2 join
@@ -257,7 +284,7 @@ sub remove : method {
 		if(ref $check eq 'CODE') {
 			$match = $check->($self->{data}->[$idx]);
 		} else {
-			$match = ($self->{data}->[$idx]) ~~ $check;
+			$match = $self->{data}[$idx] eq $check;
 		}
 		if($match) {
 			my ($el) = splice @{$self->{data}}, $idx, 1;

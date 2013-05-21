@@ -1,6 +1,6 @@
 package EntityModel::BaseClass;
 {
-  $EntityModel::BaseClass::VERSION = '0.012';
+  $EntityModel::BaseClass::VERSION = '0.013';
 }
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';
@@ -35,7 +35,7 @@ sub new {
 	foreach my $attr (grep { !exists $data{$_} } @defaults) {
 		my $def = EntityModel::Class::_attrib_info($class, $attr);
 		my $v = $def->{default};
-		$v = $v->() if ref $v ~~ 'CODE';
+		$v = $v->() if (ref($v) // '') eq 'CODE';
 		# Still aliased to $self
 		$data{$attr} = $v;
 	}
