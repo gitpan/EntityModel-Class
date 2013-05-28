@@ -29,6 +29,7 @@
       "runtime" : {
          "requires" : {
             "Check::UnitCheck" : "0.13",
+            "Class::ISA" : "0",
             "EntityModel::Log" : "0.004",
             "Exporter" : "0",
             "IO::Handle" : "0",
@@ -54,6 +55,6 @@
       },
       "homepage" : "http://search.cpan.org/dist/EntityModel-Class/"
    },
-   "version" : "0.013"
+   "version" : "0.014"
 }
 

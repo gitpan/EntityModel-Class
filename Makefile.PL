@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
   "NAME" => "EntityModel::Class",
   "PREREQ_PM" => {
     "Check::UnitCheck" => "0.13",
+    "Class::ISA" => 0,
     "EntityModel::Log" => "0.004",
     "Exporter" => 0,
     "IO::Handle" => 0,
@@ -33,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::Deep" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.013",
+  "VERSION" => "0.014",
   "test" => {
     "TESTS" => "t/*.t"
   }
