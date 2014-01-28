@@ -7,7 +7,7 @@ use feature ();
 
 use IO::Handle;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 =head1 NAME
 
@@ -15,7 +15,7 @@ EntityModel::Class - define class definition
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -122,7 +122,6 @@ rather than classes or simple types.
 
 =cut
 
-use Try::Tiny;
 use Scalar::Util qw(refaddr);
 use Check::UnitCheck;
 use Module::Load;
@@ -153,8 +152,6 @@ Apply supplied attributes, and load in the following modules:
 =item use feature;
 
 =item use 5.010;
-
-=item use Try::Tiny;
 
 =back
 
@@ -234,11 +231,11 @@ sub load_dependencies {
 			logDebug("Already in INC: $file");
 			next CLASS;
 		}
-		try {
+		eval {
 			Module::Load::load($c);
-#			eval "package $pkg; $c->import;package $class;";
-		} catch {
-			logError($_) unless /^Can't locate /;
+			1
+		} or do {
+			logError($@) unless $@ =~ /^Can't locate /;
 		};
 	}
 }
@@ -384,16 +381,8 @@ sub setup {
 	my ($class, $pkg) = @_;
 
 	strict->import;
-
 	warnings->import();
 	feature->import(':5.10');
-	Try::Tiny->export_to_level(2); # package -> import -> setup
-
-# Bring in the now, trim and restring helpers
-	foreach my $m (qw/trim now restring/) {
-		no strict 'refs';
-		*{$pkg . '::' . $m} = \&$m;
-	}
 }
 
 

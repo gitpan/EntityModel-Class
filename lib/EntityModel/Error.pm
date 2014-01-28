@@ -1,7 +1,5 @@
 package EntityModel::Error;
-{
-  $EntityModel::Error::VERSION = '0.014';
-}
+$EntityModel::Error::VERSION = '0.015';
 use strict;
 use warnings FATAL => 'all', NONFATAL => 'redefine';
 use 5.010;
@@ -12,7 +10,7 @@ EntityModel::Error - generic error object
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 DESCRIPTION
 
