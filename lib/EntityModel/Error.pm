@@ -1,8 +1,7 @@
 package EntityModel::Error;
-$EntityModel::Error::VERSION = '0.015';
+$EntityModel::Error::VERSION = '0.016';
 use strict;
-use warnings FATAL => 'all', NONFATAL => 'redefine';
-use 5.010;
+use warnings;
 
 =head1 NAME
 
@@ -10,7 +9,7 @@ EntityModel::Error - generic error object
 
 =head1 VERSION
 
-version 0.015
+Version 0.016
 
 =head1 DESCRIPTION
 
@@ -99,4 +98,4 @@ Tom Molesworth <cpan@entitymodel.com>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2008-2014. Licensed under the same terms as Perl itself.

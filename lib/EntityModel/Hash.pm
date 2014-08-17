@@ -1,8 +1,7 @@
 package EntityModel::Hash;
-$EntityModel::Hash::VERSION = '0.015';
+$EntityModel::Hash::VERSION = '0.016';
 use strict;
 use warnings;
-use 5.010;
 
 use EntityModel::Log ':all';
 
@@ -12,7 +11,7 @@ EntityModel::Hash - wrapper object for dealing with hashrefs
 
 =head1 VERSION
 
-version 0.015
+Version 0.016
 
 =head1 DESCRIPTION
 

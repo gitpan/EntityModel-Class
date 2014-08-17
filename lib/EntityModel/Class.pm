@@ -2,12 +2,12 @@ package EntityModel::Class;
 # ABSTRACT: Helper module for generating class definitions
 use strict;
 use warnings;
-use 5.010;
+
 use feature ();
 
 use IO::Handle;
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 =head1 NAME
 
@@ -15,7 +15,7 @@ EntityModel::Class - define class definition
 
 =head1 VERSION
 
-version 0.015
+Version 0.016
 
 =head1 SYNOPSIS
 

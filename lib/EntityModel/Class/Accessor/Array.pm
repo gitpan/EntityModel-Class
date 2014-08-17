@@ -1,11 +1,10 @@
 package EntityModel::Class::Accessor::Array;
-$EntityModel::Class::Accessor::Array::VERSION = '0.015';
+$EntityModel::Class::Accessor::Array::VERSION = '0.016';
 use strict;
-use warnings FATAL => 'all', NONFATAL => 'redefine';
-use 5.010;
-use feature ();
+use warnings;
 
 use parent qw{EntityModel::Class::Accessor};
+
 use EntityModel::Array;
 use EntityModel::Log ':all';
 use Class::ISA;
@@ -18,7 +17,7 @@ EntityModel::Class::Accessor::Array - generic class accessor for arrays
 
 =head1 VERSION
 
-version 0.015
+Version 0.016
 
 =head1 DESCRIPTION
 
@@ -104,4 +103,4 @@ Tom Molesworth <cpan@entitymodel.com>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2008-2011. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2008-2014. Licensed under the same terms as Perl itself.

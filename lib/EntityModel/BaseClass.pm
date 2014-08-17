@@ -1,8 +1,7 @@
 package EntityModel::BaseClass;
-$EntityModel::BaseClass::VERSION = '0.015';
+$EntityModel::BaseClass::VERSION = '0.016';
 use strict;
-use warnings FATAL => 'all', NONFATAL => 'redefine';
-use 5.010;
+use warnings;
 
 use Scalar::Util ();
 use EntityModel::Log ':all';
